@@ -57,6 +57,7 @@ persistence
 ##  Diagram de class
 
 + explication des classes
+
 | Feature | Description |
 |---------|-------------|
 |  **User** | Complete user registration, authentication, and profile management |
