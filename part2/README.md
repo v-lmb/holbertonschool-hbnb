@@ -1,7 +1,4 @@
-# Templates
----
-
-# Project Name
+# HBnB - Part 2
 
 ## 📌 Overview
 
@@ -11,27 +8,6 @@ Explain **what the project does**, **why it exists**, and **what problem it solv
 Context example:
 
 > This project is part of the Holberton School curriculum and focuses on low-level programming concepts in C.
-
----
-
-## 📑 Table of Contents
-
-* [Overview](#-overview)
-* [Features](#-features)
-* [General Behavior](#-general-behavior)
-* [Project Structure](#-project-structure)
-* [Flowchart](#-flowchart)
-* [Prerequisites](#-prerequisites)
-* [Installation](#-installation)
-* [Compilation](#-compilation)
-* [Usage](#-usage)
-* [Allowed Functions](#-allowed-functions)
-* [Limitations](#-limitations)
-* [Documentation](#-documentation)
-* [Technologies Used](#-technologies-used)
-* [Authors](#-authors)
-* [Version History](#-version-history)
-* [License](#-license)
 
 ---
 
@@ -192,48 +168,24 @@ Example:
 
 ---
 
-## 📘 Documentation
-
-Indicate where the documentation is located.
-
-Example:
-
-* Man page: `man_1_project_name.man`
-
----
-
-## 🧰 Technologies Used
-
-<div align="left">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg" height="40" alt="c logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" height="40" alt="github logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" height="40" alt="linux logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg" height="40" alt="windows8 logo"  />
-  <img width="12" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" height="40" alt="vscode logo"  />
-</div>
+## 📘 Ressources
+- [Flask Documentation](https://flask.palletsprojects.com/en/stable/)
+- [Flask-RESTx Documentation](https://flask-restx.readthedocs.io/en/latest/)
+- [Python Project Structure Best Practices](https://docs.python-guide.org/writing/structure/)
+- [Facade Design Pattern in Python](https://refactoring.guru/design-patterns/facade/python/example)
+- [Python OOP Basics](https://realpython.com/python3-object-oriented-programming/)
+- [Designing Classes and Relationships:](https://docs.python.org/3/tutorial/classes.html)
+- [Why You Should Use UUIDs](https://datatracker.ietf.org/doc/html/rfc4122)
+- [Testing REST APIs with cURL](https://everything.curl.dev/)
+- [Designing RESTful APIs](https://restfulapi.net/)
 
 ---
 
 ## 👥 Authors
 
-* **Name** — [GitHub](https://github.com/username)
-* **Name** — [GitHub](https://github.com/username)
+| Name | GitHub |
+|------|--------|
+| Victor | [GitHub](https://github.com/victormonnot) |
+| Virginie | [GitHub](https://github.com/v-lmb) |
 
 ---
-
-## 📝 Version History
-
-* **v1.0** — Initial release
-
----
-
-## 📜 License
-
-Specify the license.
-
-Example:
-This project is licensed under the **GNU GPL v3.0**.
