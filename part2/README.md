@@ -192,7 +192,6 @@ Example:
 ---
 
 ## 👥 Authors
-The incredible ones
-[Victor](https://github.com/victormonnot) | [Virginie](https://github.com/v-lmb) 
+The Incredible [Victor](https://github.com/victormonnot) and Little [Virginie](https://github.com/v-lmb) 
 
 ---
