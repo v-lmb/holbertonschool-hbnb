@@ -204,7 +204,7 @@ curl -X PUT http://127.0.0.1:5000/api/v1/users/<user_id> \
   -d '{
     "first_name": "John",
     "last_name": "Watson",
-    "email": "john.watson@bestie.com"
+    "email": "john.watson@armychronicles.com"
   }'
 ```
 > 💡 Use a **valid user_id**
@@ -215,7 +215,7 @@ curl -X PUT http://127.0.0.1:5000/api/v1/users/<user_id> \
   "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "first_name": "John",
   "last_name": "Watson",
-  "email": "john.watson@bestie.com"
+  "email": "john.watson@armychronicles.com"
 }
 ```
 
@@ -276,9 +276,9 @@ curl -X PUT http://127.0.0.1:5000/api/v1/amenities/<amenity_id> \
 curl -X POST http://127.0.0.1:5000/api/v1/places/ \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Cozy Apartment",
-    "description": "A lovely place in the city center",
-    "price": 120.0,
+    "title": "221B Baker Street",
+    "description": "Mind the experiments. And the violin.",
+    "price": 221.0,
     "latitude": 51.523767,
     "longitude": -0.158555,
     "owner_id": "<user_id>"
@@ -290,9 +290,9 @@ curl -X POST http://127.0.0.1:5000/api/v1/places/ \
 ```json
 {
   "id": "2fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "title": "Cozy Apartment",
-  "description": "A lovely place in the city center",
-  "price": 120.0,
+  "title": "221B Baker Street",
+  "description": "Mind the experiments. And the violin.",
+  "price": 221.0,
   "latitude": 51.523767,
   "longitude": -0.158555,
   "owner": {
