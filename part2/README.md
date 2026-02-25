@@ -2,37 +2,45 @@
 
 ## 📌 Overview
 
-Short and clear description of the project.
-Explain **what the project does**, **why it exists**, and **what problem it solves**.
+In this phase of the **HBnB project**, you will begin implementing the application based on the architecture defined previously. You will develop the Presentation and Business Logic layers using Python and Flask, creating the project structure, business classes, and API endpoints.
 
-Context example:
-
-> This project is part of the Holberton School curriculum and focuses on low-level programming concepts in C.
+The goal is to make the architecture functional by implementing user, location, review, and equipment management in accordance with REST best practices. JWT authentication and role management will be addressed later with **Flask** and **flask-restx**.
 
 ---
 
-## ✅ Features
+## ✅ Objectives
 
-List the main features of the project.
+The goal of this project is to enable you to :
 
-Example:
-
-* Feature 1
-* Feature 2
-* Feature 3
+- Set Up the Project Structure:
+  - Organize the project into a modular architecture, following best practices for Python and Flask applications.
+  - Create the necessary packages for the Presentation and Business Logic layers.
+  
+- Implement the Business Logic Layer:
+  - Develop the core classes for the business logic, including User, Place, Review, and Amenity entities.
+  - Implement relationships between entities and define how they interact within the application.
+  - Implement the facade pattern to simplify communication between the Presentation and Business Logic layers.
+ 
+- Build RESTful API Endpoints:
+  - Implement the necessary API endpoints to handle CRUD operations for Users, Places, Reviews, and Amenities.
+  - Use flask-restx to define and document the API, ensuring a clear and consistent structure.
+  - Implement data serialization to return extended attributes for related objects. For example, when retrieving a Place, the API should include details such as the owner’s first_name, last_name, and relevant amenities.
+    
+- Test and Validate the API:
+  - Ensure that each endpoint works correctly and handles edge cases appropriately.
+  - Use tools like Postman or cURL to test your API endpoints.
 
 ---
 
-## 🧾 General Behavior
+## 🧾 Learning Objectives
 
-Describe **how the program works**, step by step, at a high level.
+The aim of this stage of the project is to develop the following skills::
 
-Example:
-
-* Reads user input
-* Parses arguments
-* Executes actions
-* Handles errors
+- **Modular Design and Architecture**  
+- **API Development with Flask and flask-restx**
+- **Business Logic Implementation**
+- **Data Serialization and Composition Handling**
+- **Testing and Debugging**
 
 ---
 
@@ -72,9 +80,6 @@ hbnb/
 ├── requirements.txt
 └── README.md
 ```
-
-Explain briefly the role of key files if needed.
-
 ---
 
 ## 🔁 Flowchart
@@ -187,10 +192,7 @@ Example:
 ---
 
 ## 👥 Authors
-
-| Name | GitHub |
-|------|--------|
-| Victor | [GitHub](https://github.com/victormonnot) |
-| Virginie | [GitHub](https://github.com/v-lmb) |
+The incredible ones
+[Victor](https://github.com/victormonnot) | [Virginie](https://github.com/v-lmb) 
 
 ---
