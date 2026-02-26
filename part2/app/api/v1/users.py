@@ -22,9 +22,17 @@ user_model = api.model('User', {
 
 @api.route('/')
 class UserList(Resource):
+    """
+    Ressources for the users collection
+    """
     @api.response(200, 'List of users retrivied successfully')
     def get(self):
-        """Avoir tous les users"""
+        """
+        Retrive all users
+        Return: list
+        code 200 list of all user dictionnaries
+        empty list if no users exist
+        """
         users = facade.get_all_users()
         return [
             {
@@ -41,9 +49,13 @@ class UserList(Resource):
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new user"""
+        """
+        Register a new user
+        Return: dict
+        code 201 with creat user data
+        code 400 if the mail is already registered or imput data is invalid
+        """
         user_data = api.payload
-# ==== vérification mail unique ====
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
@@ -61,10 +73,19 @@ class UserList(Resource):
 
 @api.route('/<user_id>')
 class UserResource(Resource):
+    """
+    Ressource for a single user
+    """
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get user details by ID"""
+        """
+        Retrieve a user by his ID
+        user_id: str, UUID of the user
+        Return: dict
+        code 200 with user's data
+        code 404 if not found
+        """
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -80,7 +101,14 @@ class UserResource(Resource):
     @api.response(404, 'User not found')
     @api.response(400, 'Invalid imput data')
     def put(self, user_id):
-        """MAJ User"""
+        """
+        Update an existing user
+        user_id: str, UUID of the user
+        Return: dict
+        code 200 with user's data
+        code 404 if not found
+        code 400 if data is invalid
+        """
         user_data = api.payload
         try:
             user = facade.update_user(user_id, user_data)
