@@ -4,25 +4,25 @@ from app.services import facade
 api = Namespace("places", description="Place operations")
 
 # Model for amenity
-amenity_model = api.model("Amenity", {
-    "id": fields.String,
-    "name": fields.String
+amenity_model = api.model("PlaceAmenity", {
+    "id": fields.String(),
+    "name": fields.String()
 })
 
 # Model for owner of a place
-user_model = api.model("User", {
-    "id": fields.String,
-    "first_name": fields.String,
-    "last_name": fields.String,
-    "email": fields.String
+user_model = api.model("PlaceUser", {
+    "id": fields.String(),
+    "first_name": fields.String(),
+    "last_name": fields.String(),
+    "email": fields.String()
 })
 
 # Model for review
-review_model = api.model("Review", {
-    "id": fields.String,
-    "text": fields.String,
-    "rating": fields.Integer,
-    "user_id": fields.String
+review_model = api.model("PlaceReview", {
+    "id": fields.String(),
+    "text": fields.String(),
+    "rating": fields.Integer(),
+    "user_id": fields.String()
 })
 
 # Model for place input validation and doc

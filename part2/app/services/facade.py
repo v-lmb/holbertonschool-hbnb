@@ -39,6 +39,16 @@ class HBnBFacade:
         """
         return self.user_repo.get_by_attribute('email', email)
 
+    def get_all_users(self):
+        return self.user_repo.get_all()
+
+    def update_user(self, user_id, user_data):
+        user = self.user_repo.get(user_id)
+        if not user:
+            return None
+        user.update(user_data)
+        return user
+
     # ====== PLACE ======
     def create_place(self, data):
         """
@@ -182,7 +192,3 @@ class HBnBFacade:
             return None
         amenity.update(amenity_data)
         return amenity
-
-
-# ====== GLOBAL INSTANCE ======
-facade = HBnBFacade()
