@@ -11,11 +11,19 @@ amenity_model = api.model('Amenity', {
 
 @api.route('/')
 class AmenityList(Resource):
+    """
+    Ressource for the amenities collection
+    """
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new amenity"""
+        """
+        Create a new amenity
+        Return: dict
+        code 201 with created amenity
+        code 400 if validation fails
+        """
         amenity_data = api.payload
         try:
             new_amenity = facade.create_amenity(amenity_data)
@@ -28,7 +36,12 @@ class AmenityList(Resource):
 
     @api.response(200, 'List of amenities retrieved successfully')
     def get(self):
-        """Retrieve a list of all amenities"""
+        """
+        Retrieve all amenities
+        Return: list
+        code 200 with a list of all amenity disctionnaries
+        empty list if no amenities exist
+        """
         amenities = facade.get_all_amenities()
         return [
             {
@@ -41,10 +54,19 @@ class AmenityList(Resource):
 
 @api.route('/<amenity_id>')
 class AmenityResource(Resource):
+    """
+    Ressource for a single amenity
+    """
     @api.response(200, 'Amenity details retrieved successfully')
     @api.response(404, 'Amenity not found')
     def get(self, amenity_id):
-        """Get amenity details by ID"""
+        """
+        Retrieve an amenity with his ID
+        amenity_id : str, UUID
+        Return: disct
+        code 200 with amenity data
+        code 404 if not found
+        """
         amenity = facade.get_amenity(amenity_id)
         if not amenity:
             return {'error': 'Amenity not found'}, 404
@@ -58,7 +80,14 @@ class AmenityResource(Resource):
     @api.response(404, 'Amenity not found')
     @api.response(400, 'Invalid input data')
     def put(self, amenity_id):
-        """Update an amenity's information"""
+        """
+        Update an existing amenity
+        amenity_id : str, UUID
+        Return: disct
+        code 200 if success
+        code 404 if not found
+        code 400 if data is invalid
+        """
         amenity_data = api.payload
         try:
             amenity = facade.update_amenity(amenity_id, amenity_data)

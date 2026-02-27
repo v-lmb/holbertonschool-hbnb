@@ -4,7 +4,13 @@ from app.models.place import Place
 
 
 class Review(BaseModel):
+    """
+    Represents a review
+    """
     def __init__(self, text, rating, place, user):
+        """
+        Initialize a new review instance
+        """
         super().__init__()
 
         if not text or not isinstance(text, str):
@@ -27,6 +33,9 @@ class Review(BaseModel):
         place.add_review(self)
 
     def to_dict(self):
+        """
+        Serialize the review instance to a dictionary
+        """
         return {
             "id": self.id,
             "text": self.text,
