@@ -70,9 +70,10 @@ hbnb/
 │   │   └── repository.py
 │   ├── tests/
 │   │   ├── __init__.py
-│   │   ├── à compléter
-│   │   ├── à compléter bis
-│   │   └── à compléter bis bis
+│   │   ├── test_amenity.py
+│   │   ├── test_place.py
+│   │   ├── test_review.py
+│   │   └── test_user.py
 ├── run.py
 ├── config.py
 ├── requirements.txt
