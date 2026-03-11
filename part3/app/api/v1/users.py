@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 api = Namespace('users', description='User operations')
@@ -16,6 +17,10 @@ user_model = api.model('User', {
     'email': fields.String(
         required=True,
         description='Email of the user'
+    ),
+    'password': fields.String(
+        required=True,
+        description='Password of the user'
     )
 })
 
@@ -48,6 +53,8 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Admin privileges required')
+    @jwt_required()
     def post(self):
         """
         Register a new user
@@ -55,6 +62,10 @@ class UserList(Resource):
         code 201 with creat user data
         code 400 if the mail is already registered or imput data is invalid
         """
+        claims = get_jwt()
+        if not claims.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
         user_data = api.payload
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
@@ -100,6 +111,8 @@ class UserResource(Resource):
     @api.response(200, 'User successufully updates')
     @api.response(404, 'User not found')
     @api.response(400, 'Invalid imput data')
+    @api.response(403, 'Admin privileges required')
+    @jwt_required()
     def put(self, user_id):
         """
         Update an existing user
@@ -109,7 +122,31 @@ class UserResource(Resource):
         code 404 if not found
         code 400 if data is invalid
         """
+        current_user = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
+        
         user_data = api.payload
+        
+        if is_admin:
+            if 'email' in user_data and user_data['email']:
+                existing_user = facade.get_user_by_email(user_data['email'])
+                if existing_user and existing_user.id != user_id:
+                    return{'error': 'Email already in use'}, 400
+
+            if 'password' in user_data and user_data['password']:
+                user = facade.get_user(user_id)
+                if not user:
+                    return {'error': 'User not found'}, 404
+                user.hash_password(user_data['password'])
+                del user_data['password']
+
+            else:
+                if current_user != user_data:
+                    return {'error': 'Unauthorized action'}, 403
+                if 'email' in user_data or 'password' in user_data:
+                    return {'error': 'You cannot modify email or password'}, 400
+
         try:
             user = facade.update_user(user_id, user_data)
             if not user:
