@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 api = Namespace("places", description="Place operations")
@@ -44,6 +45,7 @@ class PlaceList(Resource):
     """
 
     @api.expect(place_model)
+    @jwt_required()
     def post(self):
         """
         Create a new place
@@ -51,8 +53,11 @@ class PlaceList(Resource):
         code 201 with the created place data
         code 400 if validation fails
         """
+        current_user = get_jwt_identity()
+        place_data = api.payload
+        place_data['owner_id'] = current_user
         try:
-            place = facade.create_place(api.payload)
+            place = facade.create_place(place_data)
             return place.to_dict(), 201
         except ValueError as e:
             return {"error": str(e)}, 400
@@ -88,6 +93,7 @@ class PlaceResource(Resource):
         return place.to_dict(), 200
 
     @api.expect(place_model)
+    @jwt_required()
     def put(self, place_id):
         """
         Update an existing palce
@@ -96,10 +102,19 @@ class PlaceResource(Resource):
         code 200 if success
         code 404 if not found
         """
-        place = facade.update_place(place_id, api.payload)
+        current_user = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
+        place = facade.get_place(place_id)
         if not place:
             return {"error": "Place not found"}, 404
-        return {"message": "Place updated successfully"}, 200
+        if not is_admin and place.owner.id != current_user:
+            return {'error': 'Unautorized action'}, 403
+        try:
+            place = facade.update_place(place_id, api.payload)
+            return {"message": "Place updated successfully"}, 200
+        except ValueError as e:
+            return {"error": str(e)}, 400
 
 
 @api.route("/<place_id>/reviews")

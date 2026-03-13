@@ -1,4 +1,5 @@
 import re
+from app import bycrypt
 from app.models.base import BaseModel
 
 
@@ -6,7 +7,7 @@ class User(BaseModel):
     """
     Represent a user
     """
-    def __init__(self, first_name, last_name, email, is_admin=False):
+    def __init__(self, first_name, last_name, email, password, is_admin=False **kwargs):
         """
         Initialize a new user instance.
         first_name: str, user's first name
@@ -21,6 +22,19 @@ class User(BaseModel):
         self.last_name = self._validate_name(last_name, "last_name")
         self.email = self._validate_email(email)
         self.is_admin = is_admin
+        self.hash_password(password)
+
+    def hash_password(self, password):
+        """
+        Hash th password before storing it
+        """
+        self.password = bycrypt.generate_password_hash(password).decode('utf-8')
+
+    def verify_password(self, password):
+        """
+        Verifies if the provied password matches the hashed password
+        """
+        return bycrypt.check_passord_hash(self.password, password)
 
     def _validate_name(self, value, field_name):
         """
