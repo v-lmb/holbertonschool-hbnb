@@ -1,98 +1,105 @@
 from abc import ABC, abstractmethod
+from app import db
 
 
 class Repository(ABC):
     """
-    Abstract base class defining the interface for all repositories
+    Abstract base class defining the interface for all repositories.
+    All implementations (InMemory, SQLAlchemy) must
+    implement these methods.
     """
     @abstractmethod
     def add(self, obj):
-        """
-        Store a new object in the repository
-        """
         pass
 
     @abstractmethod
     def get(self, obj_id):
-        """
-        Retrieve an object by its unique identifier
-        """
         pass
 
     @abstractmethod
     def get_all(self):
-        """
-        Retrieve all objects stored in the repository
-        """
         pass
 
     @abstractmethod
     def update(self, obj_id, data):
-        """
-        Update an existing object with new data
-        """
         pass
 
     @abstractmethod
     def delete(self, obj_id):
-        """
-        Delete an object from the repository
-        """
         pass
 
     @abstractmethod
     def get_by_attribute(self, attr_name, attr_value):
-        """
-        Retrieve the first object matching a specific attribute value
-        """
         pass
 
 
 class InMemoryRepository(Repository):
     """
-    In-memory implementation of the Repository interface
+    In-memory implementation of the Repository interface.
+    Kept for reference / tests without a database.
     """
     def __init__(self):
-        """
-        Initialize an empty in-memory storage dictionary
-        """
         self._storage = {}
 
     def add(self, obj):
-        """
-        Store an object using its ID as the key
-        """
         self._storage[obj.id] = obj
 
     def get(self, obj_id):
-        """
-        Retrieve an object by its ID
-        """
         return self._storage.get(obj_id)
 
     def get_all(self):
-        """
-        Retrieve all stored objects as a list
-        """
         return list(self._storage.values())
 
     def update(self, obj_id, data):
-        """
-        Update an object's attributes from a dictionary
-        """
         obj = self.get(obj_id)
         if obj:
             obj.update(data)
 
     def delete(self, obj_id):
-        """
-        Remove an object from storage
-        """
         if obj_id in self._storage:
             del self._storage[obj_id]
 
     def get_by_attribute(self, attr_name, attr_value):
-        """
-        Find the first object matching a specific attribute value
-        """
-        return next((obj for obj in self._storage.values() if getattr(obj, attr_name) == attr_value), None)
+        return next(
+            (obj for obj in self._storage.values()
+             if getattr(obj, attr_name) == attr_value),
+            None
+        )
+
+
+class SQLAlchemyRepository(Repository):
+    """
+    SQLAlchemy implementation of the Repository interface.
+    Utilise db.session pour interagir avec la BDD.
+
+    The 'model' parameter indicates which SQLAlchemy model to work with
+    (User, Place, Review, Amenity).
+    """
+    def __init__(self, model):
+        self.model = model
+
+    def add(self, obj):
+        db.session.add(obj)
+        db.session.commit()
+
+    def get(self, obj_id):
+        return self.model.query.get(obj_id)
+
+    def get_all(self):
+        return self.model.query.all()
+
+    def update(self, obj_id, data):
+        obj = self.get(obj_id)
+        if obj:
+            for key, value in data.items():
+                setattr(obj, key, value)
+            db.session.commit()
+
+    def delete(self, obj_id):
+        obj = self.get(obj_id)
+        if obj:
+            db.session.delete(obj)
+            db.session.commit()
+
+    def get_by_attribute(self, attr_name, attr_value):
+        return self.model.query.filter_by(**{attr_name: attr_value}).first()

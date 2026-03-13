@@ -33,7 +33,6 @@ place_model = api.model("Place", {
     "price": fields.Float(required=True),
     "latitude": fields.Float(required=True),
     "longitude": fields.Float(required=True),
-    "owner_id": fields.String(required=True),
     "amenities": fields.List(fields.String)
 })
 
@@ -48,14 +47,14 @@ class PlaceList(Resource):
     @jwt_required()
     def post(self):
         """
-        Create a new place
-        Return: dict
-        code 201 with the created place data
-        code 400 if validation fails
+        Create a new place.
+        Requires JWT: owner_id is automatically set
+        to the authenticated user (extracted from token).
         """
         current_user = get_jwt_identity()
         place_data = api.payload
-        place_data['owner_id'] = current_user
+        place_data['owner_id'] = current_user  # Owner = authenticated user
+
         try:
             place = facade.create_place(place_data)
             return place.to_dict(), 201
@@ -64,10 +63,8 @@ class PlaceList(Resource):
 
     def get(self):
         """
-        Retrieve all places
-        Return: list
-        code 200 with list of all place dictionnaries
-        empty list if no places exist
+        Retrieve all places.
+        Public.
         """
         places = facade.get_all_places()
         return [p.to_dict() for p in places], 200
@@ -81,11 +78,8 @@ class PlaceResource(Resource):
 
     def get(self, place_id):
         """
-        Retrieve place with his ID
-        place_id: str, UUID
-        Retrun: dict
-        code 200 with data place
-        code 404 if not found
+        Retrieve place with his ID.
+        Public.
         """
         place = facade.get_place(place_id)
         if not place:
@@ -96,20 +90,22 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """
-        Update an existing palce
-        place_id: str, UUID
-        Retrun: dict
-        code 200 if success
-        code 404 if not found
+        Update an existing place.
+        Requires JWT.
+        Only the owner can update (admin bypass).
         """
         current_user = get_jwt_identity()
         claims = get_jwt()
         is_admin = claims.get('is_admin', False)
+
         place = facade.get_place(place_id)
         if not place:
             return {"error": "Place not found"}, 404
+
+        # Ownership check (admin bypass)
         if not is_admin and place.owner.id != current_user:
-            return {'error': 'Unautorized action'}, 403
+            return {'error': 'Unauthorized action'}, 403
+
         try:
             place = facade.update_place(place_id, api.payload)
             return {"message": "Place updated successfully"}, 200
@@ -120,12 +116,7 @@ class PlaceResource(Resource):
 @api.route("/<place_id>/reviews")
 class PlaceReviewList(Resource):
     """
-    Retrieve all reviews for a specific place
-    place_id: str, UUID
-    Retrun:
-    list with code 200 with list of review disctionnaries
-    empty if the place has no reviews
-    dict code 404 if the place doesn't exist
+    Retrieve all reviews for a specific place.
     """
 
     def get(self, place_id):

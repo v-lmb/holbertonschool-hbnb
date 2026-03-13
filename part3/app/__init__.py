@@ -4,18 +4,24 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 
+# --- Extensions instantiated at module level ---
+# Created here so they can be imported anywhere:
+#   from app import db, bcrypt
 bcrypt = Bcrypt()
 jwt = JWTManager()
 db = SQLAlchemy()
 
+
 def create_app(config_class="config.DevelopmentConfig"):
     """
-    Create and configure the Flask application
+    Application Factory: creates and configures the Flask app.
+    config_class : string du chemin vers la classe de config
+                   (ex: "config.DevelopmentConfig")
     """
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Initialiser les extensions avec l'app
+    # Initialize extensions with the app
     bcrypt.init_app(app)
     jwt.init_app(app)
     db.init_app(app)
@@ -25,18 +31,20 @@ def create_app(config_class="config.DevelopmentConfig"):
         version='1.0',
         title='HBnB API',
         description='HBnB Application API',
-        doc='/api/v1/'
-        )
+        doc='/'
+    )
 
     # Imports inside the function to avoid circular imports
     from app.api.v1.users import api as users_ns
     from app.api.v1.places import api as places_ns
     from app.api.v1.reviews import api as reviews_ns
     from app.api.v1.amenities import api as amenities_ns
+    from app.api.v1.auth import api as auth_ns
 
     api.add_namespace(users_ns, path='/api/v1/users')
     api.add_namespace(amenities_ns, path='/api/v1/amenities')
     api.add_namespace(places_ns, path='/api/v1/places')
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
+    api.add_namespace(auth_ns, path='/api/v1/auth')
 
     return app

@@ -18,14 +18,12 @@ class AmenityList(Resource):
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
-    @api.response(403, 'Admin prvilieges required')
+    @api.response(403, 'Admin privileges required')
     @jwt_required()
     def post(self):
         """
-        Create a new amenity
-        Return: dict
-        code 201 with created amenity
-        code 400 if validation fails
+        Create a new amenity.
+        Admin only.
         """
         claims = get_jwt()
         if not claims.get('is_admin'):
@@ -44,10 +42,8 @@ class AmenityList(Resource):
     @api.response(200, 'List of amenities retrieved successfully')
     def get(self):
         """
-        Retrieve all amenities
-        Return: list
-        code 200 with a list of all amenity disctionnaries
-        empty list if no amenities exist
+        Retrieve all amenities.
+        Public.
         """
         amenities = facade.get_all_amenities()
         return [
@@ -68,11 +64,8 @@ class AmenityResource(Resource):
     @api.response(404, 'Amenity not found')
     def get(self, amenity_id):
         """
-        Retrieve an amenity with his ID
-        amenity_id : str, UUID
-        Return: disct
-        code 200 with amenity data
-        code 404 if not found
+        Retrieve an amenity with his ID.
+        Public.
         """
         amenity = facade.get_amenity(amenity_id)
         if not amenity:
@@ -90,22 +83,18 @@ class AmenityResource(Resource):
     @jwt_required()
     def put(self, amenity_id):
         """
-        Update an existing amenity
-        amenity_id : str, UUID
-        Return: disct
-        code 200 if success
-        code 404 if not found
-        code 400 if data is invalid
+        Update an existing amenity.
+        Admin only.
         """
         claims = get_jwt()
         if not claims.get('is_admin'):
-            {'error': 'Admin privileges required'}, 403
+            return {'error': 'Admin privileges required'}, 403
 
         amenity_data = api.payload
         try:
             amenity = facade.update_amenity(amenity_id, amenity_data)
             if not amenity:
                 return {'error': 'Amenity not found'}, 404
-            return {'message': 'Amenity updated successufully'}, 200
+            return {'message': 'Amenity updated successfully'}, 200
         except ValueError as e:
             return {'error': str(e)}, 400

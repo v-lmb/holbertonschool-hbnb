@@ -1,18 +1,23 @@
+from app import db
 from app.models.base import BaseModel
 
 
 class Amenity(BaseModel):
     """
-    Represents an amenity
-    Inherits from Base
+    Represents an amenity.
+    Le nom est unique (pas 2 amenities "WiFi").
     """
-    def __init__(self, name):
+    __tablename__ = 'amenities'
+
+    name = db.Column(db.String(50), nullable=False, unique=True)
+
+    def __init__(self, name, **kwargs):
         """
         Initialize a new amenity instance
         name: str
         Raises: ValueError
         """
-        super().__init__()
+        super().__init__(**kwargs)
 
         if not name or not isinstance(name, str):
             raise ValueError("Amenity name is required")
