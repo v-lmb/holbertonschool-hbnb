@@ -1,82 +1,63 @@
-# HBnB - Part 2
+# HBnB - Part 3: Enhanced Backend with Authentication and Database Integration
 
 ## 📌 Overview
 
-In this phase of the **HBnB project**, you will begin implementing the application based on the architecture defined previously. You will develop the Presentation and Business Logic layers using Python and Flask, creating the project structure, business classes, and API endpoints.
+This is **Part 3** of the HBnB project. Building on the foundation from Part 2, this phase introduces:
 
-The goal is to make the architecture functional by implementing user, location, review, and equipment management in accordance with REST best practices. JWT authentication and role management will be addressed later with **Flask** and **flask-restx**.
+- **JWT Authentication** for securing API endpoints
+- **Role-Based Access Control (RBAC)** distinguishing admin vs. regular users
+- **Database persistence** with SQLAlchemy + SQLite, replacing the in-memory storage
+- **SQL scripts** for schema creation and initial data seeding
+- **ER Diagram** documenting the database relationships
 
 ---
 
-## ✅ Objectives
+## ✅ What's New in Part 3
 
-The goal of this project is to enable you to :
+| Feature | Part 2 | Part 3 |
+|---------|--------|--------|
+| **Storage** | In-memory (dict) | SQLite via SQLAlchemy ORM |
+| **Authentication** | None | JWT tokens (flask-jwt-extended) |
+| **Password security** | None | Hashed with bcrypt |
+| **Access control** | Open | RBAC (admin / regular user) |
+| **Data persistence** | Lost on restart | Persisted in `development.db` |
+| **User creation** | Public | Admin only |
 
-- Set Up the Project Structure:
-  - Organize the project into a modular architecture, following best practices for Python and Flask applications.
-  - Create the necessary packages for the Presentation and Business Logic layers.
-  
-- Implement the Business Logic Layer:
-  - Develop the core classes for the business logic, including User, Place, Review, and Amenity entities.
-  - Implement relationships between entities and define how they interact within the application.
-  - Implement the facade pattern to simplify communication between the Presentation and Business Logic layers.
- 
-- Build RESTful API Endpoints:
-  - Implement the necessary API endpoints to handle CRUD operations for Users, Places, Reviews, and Amenities.
-  - Use flask-restx to define and document the API, ensuring a clear and consistent structure.
-  - Implement data serialization to return extended attributes for related objects. For example, when retrieving a Place, the API should include details such as the owner’s first_name, last_name, and relevant amenities.
-    
-- Test and Validate the API:
-  - Ensure that each endpoint works correctly and handles edge cases appropriately.
-  - Use tools like Postman or cURL to test your API endpoints.
-
-
-## 🧾 Learning Objectives
-
-The aim of this stage of the project is to develop the following skills::
-
-- **Modular Design and Architecture**  
-- **API Development with Flask and flask-restx**
-- **Business Logic Implementation**
-- **Data Serialization and Composition Handling**
-- **Testing and Debugging**
-
+---
 
 ## 📁 Project Structure
 
 ```
 hbnb/
 ├── app/
-│   ├── __init__.py
+│   ├── __init__.py             # Application factory + extensions (db, bcrypt, jwt)
 │   ├── api/
-│   │   ├── __init__.py
 │   │   └── v1/
-│   │       ├── __init__.py
-│   │       ├── users.py
-│   │       ├── places.py
-│   │       ├── reviews.py
-│   │       └── amenities.py
+│   │       ├── users.py        # User CRUD (JWT + RBAC protected)
+│   │       ├── places.py       # Place CRUD (ownership checks)
+│   │       ├── reviews.py      # Review CRUD (author checks)
+│   │       ├── amenities.py    # Amenity CRUD (admin only for write)
+│   │       └── auth.py         # Login endpoint + /protected test route
 │   ├── models/
-│   │   ├── __init__.py
-│   │   ├── user.py
-│   │   ├── place.py
-│   │   ├── review.py
-│   │   └── amenity.py
+│   │   ├── base.py             # Abstract SQLAlchemy base (id, created_at, updated_at)
+│   │   ├── user.py             # User model with password hashing
+│   │   ├── place.py            # Place model with owner FK + amenity M2M
+│   │   ├── review.py           # Review model with unique(user_id, place_id)
+│   │   └── amenity.py          # Amenity model with unique name
 │   ├── services/
-│   │   ├── __init__.py
-│   │   └── facade.py
-│   ├── persistence/
-│   │   ├── __init__.py
-│   │   └── repository.py
-│   ├── tests/
-│   │   ├── __init__.py
-│   │   ├── test_amenity.py
-│   │   ├── test_place.py
-│   │   ├── test_review.py
-│   │   └── test_user.py
-├── run.py
-├── config.py
+│   │   └── facade.py           # Business logic hub (Facade pattern)
+│   └── persistence/
+│       ├── repository.py       # Abstract Repository + SQLAlchemyRepository
+│       └── user_repository.py  # User-specific repo (email lookup)
+├── SQL/
+│   ├── schema.sql              # DDL script for all tables
+│   └── seed.sql                # Admin user + initial amenities
+├── tests/                      # Unit tests
+├── er_diagram.md               # Mermaid.js ER diagram
+├── run.py                      # Entry point (creates tables on startup)
+├── config.py                   # App configuration (DB URI, JWT secret)
 ├── requirements.txt
+├── .gitignore
 └── README.md
 ```
 
@@ -84,35 +65,70 @@ hbnb/
 
 | File | Role |
 |------|------|
-| `app/__init__.py` | Creates the Flask app and registers all namespaces |
-| `app/services/facade.py` | Central hub for all business logic operations |
-| `app/persistence/repository.py` | In-memory storage (will be replaced by SQL in Part 3) |
-| `app/models/base.py` | Provides `id` (UUID), `created_at`, `updated_at` to all models |
-
+| `app/__init__.py` | Application Factory: creates and configures the Flask app, initializes SQLAlchemy, Bcrypt, and JWTManager |
+| `app/api/v1/auth.py` | Login endpoint that returns a JWT token with `is_admin` claim |
+| `app/persistence/repository.py` | SQLAlchemy-backed repository implementing the Repository interface |
+| `app/persistence/user_repository.py` | User-specific repository with `get_user_by_email()` |
+| `app/services/facade.py` | Central hub for all business logic, uses SQLAlchemy repositories |
+| `app/models/base.py` | Abstract base model providing `id` (UUID), `created_at`, `updated_at` |
+| `SQL/schema.sql` | SQL DDL script to create all tables with constraints |
+| `SQL/seed.sql` | Seed data: admin user and initial amenities |
 
 ---
 
-## ⚒️​ Architecture
+## ⚒️ Architecture
 
-The application follows a 3-layer architecture:
-- PRESENTATION LAYER
-  - Flask-RESTX API endpoints
-  - app/api/v1/
+The application follows a **3-layer architecture**:
 
-- BUSINESS LOGIC LAYER
-  - Models: User, Place, Review
-  - Amenity + Facade pattern
-  - app/models/ + app/services/ 
-
-- PERSISTENCE LAYER
-  - In-memory repository
-  - app/persistence/
+```
+┌─────────────────────────────────────────┐
+│         PRESENTATION LAYER              │
+│   Flask-RESTX API + JWT Authentication  │
+│   app/api/v1/                           │
+├─────────────────────────────────────────┤
+│         BUSINESS LOGIC LAYER            │
+│   Models (SQLAlchemy ORM) + Facade      │
+│   app/models/ + app/services/           │
+├─────────────────────────────────────────┤
+│         PERSISTENCE LAYER               │
+│   SQLAlchemy Repository + SQLite DB     │
+│   app/persistence/ + development.db     │
+└─────────────────────────────────────────┘
+```
 
 #### Facade Pattern
-All API endpoints communicate exclusively through a single HBnBFacade instance, which acts as the unique entry point to the business logic:
+All API endpoints communicate exclusively through a single `HBnBFacade` instance:
 ```
-API → HBnBFacade → Models / Repository
+API → HBnBFacade → SQLAlchemy Repository → SQLite DB
 ```
+
+#### Authentication Flow
+```
+Client → POST /auth/login (email + password)
+Server → Verify with bcrypt → Create JWT (identity + is_admin claim)
+Client → Include "Authorization: Bearer <token>" in subsequent requests
+Server → Decode JWT → Check identity + admin status → Allow/Deny
+```
+
+---
+
+## 🔐 Endpoint Protection Summary
+
+| Endpoint | Auth | Who can access |
+|----------|------|----------------|
+| `POST /auth/login` | Public | Anyone |
+| `GET /users/`, `GET /users/<id>` | Public | Anyone |
+| `POST /users/` | JWT | Admin only |
+| `PUT /users/<id>` | JWT | Own profile (no email/pwd) or Admin (full) |
+| `GET /places/`, `GET /places/<id>` | Public | Anyone |
+| `POST /places/` | JWT | Authenticated users |
+| `PUT /places/<id>` | JWT | Owner or Admin |
+| `GET /amenities/`, `GET /amenities/<id>` | Public | Anyone |
+| `POST /amenities/`, `PUT /amenities/<id>` | JWT | Admin only |
+| `GET /reviews/`, `GET /reviews/<id>` | Public | Anyone |
+| `POST /reviews/` | JWT | Authenticated (not own place, max 1 per place) |
+| `PUT /reviews/<id>` | JWT | Author or Admin |
+| `DELETE /reviews/<id>` | JWT | Author or Admin |
 
 ---
 
@@ -127,10 +143,10 @@ API → HBnBFacade → Models / Repository
 git clone https://github.com/v-lmb/holbertonschool-hbnb.git
 ```
 
-2. Create a virtual environnement (recommended):
+2. Create a virtual environment (recommended):
 ```bash
-python3 -m venv venv  
-source venv/bin/activate  
+python3 -m venv venv
+source venv/bin/activate
 ```
 
 3. Install dependencies:
@@ -139,44 +155,60 @@ pip install -r requirements.txt
 ```
 
 ## 🔎 Usage
-1. Run the application using this command:
+
+1. Run the application:
 ```bash
 python run.py
 ```
+> The SQLite database (`development.db`) is automatically created on first startup.
 
-2. Open a browser and visit the localhost at:
+2. Swagger documentation is accessible at:
 ```
-http://127.0.0.1:5000
-```
-   
-4. Swagger documentation is accessible at:
-```
-http://127.0.0.1:5000/api/v1/
+http://127.0.0.1:5000/
 ```
 
 ---
 
-## 🔁 Tests with cURL
+## 🔁 Testing with cURL
+
+### Step 1: Login (get a JWT token)
+
+#### Admin login
+```bash
+curl -X POST http://127.0.0.1:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@hbnb.io", "password": "admin1234"}'
+```
+**Response (200):**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+> Save the token for use in authenticated requests below.
+
+---
 
 ### Users
-> 💡 All endpoints are prefixed with `/api/v1/`
 
-| Method | Endpoint | Description | Status Codes |
-|--------|----------|-------------|--------------|
-| `POST` | `/api/v1/users/` | Register a new user | 201, 400 |
-| `GET` | `/api/v1/users/` | Retrieve all users | 200 |
-| `GET` | `/api/v1/users/<user_id>` | Retrieve a user by ID | 200, 404 |
-| `PUT` | `/api/v1/users/<user_id>` | Update a user | 200, 400, 404 |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/v1/users/` | Public | Retrieve all users |
+| `GET` | `/api/v1/users/<user_id>` | Public | Retrieve a user by ID |
+| `POST` | `/api/v1/users/` | Admin | Register a new user |
+| `PUT` | `/api/v1/users/<user_id>` | JWT | Update a user |
 
-
-#### Create a User
+#### Create a User (Admin only)
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/users/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <ADMIN_TOKEN>" \
   -d '{
     "first_name": "Sherlock",
     "last_name": "Holmes",
-    "email": "sherlock.holmes@detective.com"
+    "email": "sherlock@detective.com",
+    "password": "elementary"
   }'
 ```
 **Response (201):**
@@ -185,214 +217,130 @@ curl -X POST http://127.0.0.1:5000/api/v1/users/ \
   "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
   "first_name": "Sherlock",
   "last_name": "Holmes",
-  "email": "sherlock.holmes@detective.com"
+  "email": "sherlock@detective.com"
 }
 ```
-#### Get All Users
-```bash
-curl http://127.0.0.1:5000/api/v1/users/
-```
 
-#### Get User by ID
-```bash
-curl http://127.0.0.1:5000/api/v1/users/<user_id>
-```
-
-#### Update a User
-```bash
-curl -X PUT http://127.0.0.1:5000/api/v1/users/<user_id> \
-  -H "Content-Type: application/json" \
-  -d '{
-    "first_name": "John",
-    "last_name": "Watson",
-    "email": "john.watson@armychronicles.com"
-  }'
-```
-> 💡 Use a **valid user_id**
-
-**Response (200):**
-```json
-{
-  "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "first_name": "John",
-  "last_name": "Watson",
-  "email": "john.watson@armychronicles.com"
-}
-```
+> Note: The password is **never** returned in any API response.
 
 ---
-   
-### Amenity
 
-| Method | Endpoint | Description | Status Codes |
-|--------|----------|-------------|--------------|
-| `POST` | `/api/v1/amenities/` | Create a new amenity | 201, 400 |
-| `GET` | `/api/v1/amenities/` | Retrieve all amenities | 200 |
-| `GET` | `/api/v1/amenities/<amenity_id>` | Retrieve an amenity by ID | 200, 404 |
-| `PUT` | `/api/v1/amenities/<amenity_id>` | Update an amenity | 200, 400, 404 |
+### Amenities
 
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/v1/amenities/` | Public | Retrieve all amenities |
+| `GET` | `/api/v1/amenities/<id>` | Public | Retrieve an amenity |
+| `POST` | `/api/v1/amenities/` | Admin | Create a new amenity |
+| `PUT` | `/api/v1/amenities/<id>` | Admin | Update an amenity |
 
-#### Create an Amenity
+#### Create an Amenity (Admin only)
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <ADMIN_TOKEN>" \
   -d '{"name": "Wi-Fi"}'
-```
-**Response (201):**
-```json
-{
-  "id": "1fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "name": "Wi-Fi"
-}
-```
-
-#### Update an Amenity
-```bash
-curl -X PUT http://127.0.0.1:5000/api/v1/amenities/<amenity_id> \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Air Conditioning"}'
-```
-> 💡 Use a **valid amenity_id**
-
-**Response (200):**
-```json
-{
-  "message": "Amenity updated successfully"
-}
 ```
 
 ---
-### Places 
 
-| Method | Endpoint | Description | Status Codes |
-|--------|----------|-------------|--------------|
-| `POST` | `/api/v1/places/` | Create a new place | 201, 400 |
-| `GET` | `/api/v1/places/` | Retrieve all places | 200 |
-| `GET` | `/api/v1/places/<place_id>` | Retrieve a place by ID | 200, 404 |
-| `PUT` | `/api/v1/places/<place_id>` | Update a place | 200, 400, 404 |
-| `GET` | `/api/v1/places/<place_id>/reviews` | Get all reviews for a place | 200, 404 |
+### Places
 
-#### Create a Place
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/v1/places/` | Public | Retrieve all places |
+| `GET` | `/api/v1/places/<id>` | Public | Retrieve a place |
+| `POST` | `/api/v1/places/` | JWT | Create a place (owner = you) |
+| `PUT` | `/api/v1/places/<id>` | JWT | Update (owner or admin) |
+
+#### Create a Place (Authenticated)
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/places/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
   -d '{
     "title": "221B Baker Street",
     "description": "Mind the experiments. And the violin.",
     "price": 221.0,
     "latitude": 51.523767,
-    "longitude": -0.158555,
-    "owner_id": "<user_id>"
+    "longitude": -0.158555
   }'
 ```
-> 💡 Use a **valid user_id**
+> `owner_id` is automatically extracted from the JWT token — no need to pass it.
 
-**Response (201):**
-```json
-{
-  "id": "2fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "title": "221B Baker Street",
-  "description": "Mind the experiments. And the violin.",
-  "price": 221.0,
-  "latitude": 51.523767,
-  "longitude": -0.158555,
-  "owner": {
-    "id": "<user_id>",
-    "first_name": "Sherlock",
-    "last_name": "Holmes",
-    "email": "sherlock.holmes@detective.com"
-  },
-  "amenities": [],
-  "reviews": []
-}
-```
-
-#### ⚠️​ Validation Rules for Places
+**Validation Rules:**
 
 | Field | Rule |
 |-------|------|
 | `title` | Required, max 100 characters |
-| `price` | Required, must be a positive number |
-| `latitude` | Required, must be between -90 and 90 |
-| `longitude` | Required, must be between -180 and 180 |
-| `owner_id` | Required, must reference an existing user |
+| `price` | Required, positive number |
+| `latitude` | Required, between -90 and 90 |
+| `longitude` | Required, between -180 and 180 |
 
 ---
-   
+
 ### Reviews
 
-| Method | Endpoint | Description | Status Codes |
-|--------|----------|-------------|--------------|
-| `POST` | `/api/v1/reviews/` | Create a new review | 201, 400 |
-| `GET` | `/api/v1/reviews/` | Retrieve all reviews | 200 |
-| `GET` | `/api/v1/reviews/<review_id>` | Retrieve a review by ID | 200, 404 |
-| `PUT` | `/api/v1/reviews/<review_id>` | Update a review | 200, 400, 404 |
-| `DELETE` | `/api/v1/reviews/<review_id>` | Delete a review | 200, 404 |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/v1/reviews/` | Public | Retrieve all reviews |
+| `GET` | `/api/v1/reviews/<id>` | Public | Retrieve a review |
+| `POST` | `/api/v1/reviews/` | JWT | Create a review |
+| `PUT` | `/api/v1/reviews/<id>` | JWT | Update (author or admin) |
+| `DELETE` | `/api/v1/reviews/<id>` | JWT | Delete (author or admin) |
 
-> ⚠️ `DELETE` is only implemented for reviews in this part of the project.
-
-#### Create a Review
+#### Create a Review (Authenticated)
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/reviews/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
   -d '{
     "text": "Amazing place, highly recommended!",
     "rating": 5,
-    "user_id": "<user_id>",
     "place_id": "<place_id>"
   }'
 ```
-> 💡 Use a **valid user_id & place_id**
+> `user_id` is automatically extracted from the JWT token.
 
-**Response (201):**
-```json
-{
-  "id": "4fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "text": "Amazing place, highly recommended!",
-  "rating": 5,
-  "user_id": "<user_id>",
-  "place_id": "<place_id>"
-}
-```
-
-#### Delete a Review
-```bash
-curl -X DELETE http://127.0.0.1:5000/api/v1/reviews/<review_id>
-```
-> 💡 Use a **valid review_id**
-
-**Response (200):**
-```json
-{
-  "message": "Review deleted successfully"
-}
-```
-
-#### ⚠️ Validation Rules for Reviews
-
-| Field | Rule |
-|-------|------|
-| `text` | Required, cannot be empty |
-| `rating` | Required, integer between 1 and 5 |
-| `user_id` | Required, must reference an existing user |
-| `place_id` | Required, must reference an existing place |
+**Review constraints:**
+- You **cannot** review your own place
+- You **cannot** review the same place twice
+- Rating must be an integer between 1 and 5
 
 ---
 
-## 📘 Ressources
+## 🗄️ Database
+
+### ER Diagram
+
+See [er_diagram.md](er_diagram.md) for the full Mermaid.js Entity-Relationship diagram.
+
+**Relationships:**
+- **User → Place**: One-to-many (a user owns multiple places)
+- **User → Review**: One-to-many (a user writes multiple reviews)
+- **Place → Review**: One-to-many (a place has multiple reviews)
+- **Place ↔ Amenity**: Many-to-many (via `place_amenity` junction table)
+
+### SQL Scripts
+
+- `SQL/schema.sql` — Creates all tables with constraints and foreign keys
+- `SQL/seed.sql` — Inserts the admin user (`admin@hbnb.io` / `admin1234`) and 3 initial amenities (WiFi, Swimming Pool, Air Conditioning)
+
+---
+
+## 📘 Resources
 - [Flask Documentation](https://flask.palletsprojects.com/en/stable/)
 - [Flask-RESTx Documentation](https://flask-restx.readthedocs.io/en/latest/)
-- [Python Project Structure Best Practices](https://docs.python-guide.org/writing/structure/)
-- [Facade Design Pattern in Python](https://refactoring.guru/design-patterns/facade/python/example)
-- [Python OOP Basics](https://realpython.com/python3-object-oriented-programming/)
-- [Designing Classes and Relationships:](https://docs.python.org/3/tutorial/classes.html)
-- [Why You Should Use UUIDs](https://datatracker.ietf.org/doc/html/rfc4122)
+- [Flask-JWT-Extended Documentation](https://flask-jwt-extended.readthedocs.io/en/stable/)
+- [Flask-SQLAlchemy Documentation](https://flask-sqlalchemy.palletsprojects.com/)
+- [Flask-Bcrypt Documentation](https://flask-bcrypt.readthedocs.io/en/latest/)
+- [SQLAlchemy ORM Tutorial](https://docs.sqlalchemy.org/en/20/orm/tutorial.html)
+- [Facade Design Pattern](https://refactoring.guru/design-patterns/facade/python/example)
 - [Testing REST APIs with cURL](https://everything.curl.dev/)
-- [Designing RESTful APIs](https://restfulapi.net/)
 
 ---
 
 ## 👥 Authors
-The Incredible [Victor](https://github.com/victormonnot) and Little [Virginie](https://github.com/v-lmb) 
+The Incredible [Victor](https://github.com/victormonnot) and Little [Virginie](https://github.com/v-lmb)
 
 ---
