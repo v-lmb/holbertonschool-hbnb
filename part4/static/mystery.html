@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBnB &mdash; Classified</title>
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html">
+                <img src="images/logo.png" alt="HBnB Logo" class="logo">
+            </a>
+            <nav>
+                <a href="index.html" class="login-button">Home</a>
+                <a href="login.html" id="login-link" class="login-button">Login</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section id="mystery-page">
+
+            <div id="mystery-intro">
+                <div class="mystery-header">
+                    <span class="mystery-file-stamp">CASE FILE #1891</span>
+                    <h1 class="mystery-title">Classified Property</h1>
+                    <p class="mystery-lead">A room has been struck from every official record. A guest checked in on the evening of 4 May 1891. He did not check out the following morning. His companion returned alone. The guest register has since been destroyed.</p>
+                </div>
+
+                <div class="mystery-cryptic-card">
+                    <div class="mystery-cryptic-photo"></div>
+                    <div class="mystery-cryptic-info">
+                        <h2>&#9632;&#9632;&#9632;&#9632;&#9632; &#9632;&#9632; &mdash; [REDACTED], Switzerland</h2>
+                        <p><strong>Owner:</strong> <span class="redacted">XXXXXXXXXX</span></p>
+                        <p><strong>Price:</strong> <span class="redacted">XXXXXXXXXX</span></p>
+                        <p><strong>Location:</strong> 46&deg;N &mdash; coordinates withheld</p>
+                        <p class="mystery-cryptic-desc">The property stands adjacent to a natural feature of considerable height. The sound of falling water is audible from every room. Three witnesses placed a tall man in a long coat at this address on the evening in question. No further information has been made available to this office.</p>
+                    </div>
+                </div>
+
+                <div class="mystery-hints">
+                    <h3>Known Leads</h3>
+                    <ul>
+                        <li>A witness left traces at a famous address on Baker Street, London.</li>
+                        <li>The professor's private correspondence was found at his Pall Mall residence.</li>
+                        <li>A letter was recovered behind a bookcase in a Norman manor.</li>
+                        <li>The detective himself wrote of it in his Sussex retirement notes.</li>
+                    </ul>
+                    <p class="mystery-hint-note">Each property holds a sealed case file. Find them. Read them.</p>
+                </div>
+
+                <div class="mystery-form">
+                    <label for="mystery-answer">What is the name of the falls?</label>
+                    <div class="mystery-input-row">
+                        <input type="text" id="mystery-answer" placeholder="Enter the name..." autocomplete="off">
+                        <button id="mystery-submit">Submit</button>
+                    </div>
+                    <p id="mystery-error"></p>
+                </div>
+            </div>
+
+            <div id="mystery-reveal">
+                <div class="mystery-reveal-stamp">CASE CLOSED</div>
+                <div class="mystery-reveal-content">
+                    <h1>Room 4, H&ocirc;tel Sauvage</h1>
+                    <h2 class="mystery-reveal-location">Meiringen, Switzerland &mdash; 1891</h2>
+                    <div class="mystery-reveal-body">
+                        <div class="mystery-reveal-photo"></div>
+                        <div class="mystery-reveal-info">
+                            <p><strong>Owner:</strong> Estate of J. Moriarty, disputed</p>
+                            <p><strong>Price:</strong> Not disclosed</p>
+                            <p class="mystery-reveal-desc">A small, spare room on the first floor of the H&ocirc;tel Sauvage, overlooking the valley. The Reichenbach Falls are visible from the window — a white column of water dropping into nothing. The room was last occupied on the night of 4 May 1891 by a guest registered under the name Sigerson. His luggage remained. His bed was not slept in. The path to the falls was found disturbed the following morning. No body was ever recovered. The hotel has not taken a booking for this room since.</p>
+                            <p class="mystery-reveal-amenities"><strong>Amenities:</strong> A view that changes everything.</p>
+                        </div>
+                    </div>
+                    <div id="mystery-booking" style="display:none;">
+                        <div class="booking-section">
+                            <h2>Reserve this place</h2>
+                            <form id="mystery-booking-form">
+                                <div class="booking-row">
+                                    <div class="booking-field">
+                                        <label for="mystery-checkin">Check-in</label>
+                                        <input type="date" id="mystery-checkin" required>
+                                    </div>
+                                    <div class="booking-field">
+                                        <label for="mystery-checkout">Check-out</label>
+                                        <input type="date" id="mystery-checkout" required>
+                                    </div>
+                                    <div class="booking-field">
+                                        <label for="mystery-guests">Guests</label>
+                                        <input type="number" id="mystery-guests" min="1" max="20" value="1" required>
+                                    </div>
+                                </div>
+                                <p id="mystery-booking-total" class="booking-total"></p>
+                                <button type="submit" class="details-button mystery-reveal-btn">Book Now</button>
+                            </form>
+                            <div id="mystery-booking-confirmation" class="booking-confirmation" style="display:none;"></div>
+                        </div>
+                    </div>
+                    <a href="index.html" class="details-button mystery-reveal-btn">Return to Baker Street</a>
+                    <button id="mystery-reset">Reopen the case</button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 HBnB &mdash; All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

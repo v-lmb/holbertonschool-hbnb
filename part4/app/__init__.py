@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
@@ -19,7 +19,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     config_class : string du chemin vers la classe de config
                    (ex: "config.DevelopmentConfig")
     """
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='../static', static_url_path='/static')
     app.config.from_object(config_class)
 
     # Initialize extensions with the app
@@ -28,12 +28,23 @@ def create_app(config_class="config.DevelopmentConfig"):
     db.init_app(app)
     CORS(app)
 
+    authorizations = {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'JWT token — format: Bearer <token>'
+        }
+    }
+
     api = Api(
         app,
         version='1.0',
         title='HBnB API',
         description='HBnB Application API',
-        doc='/'
+        doc='/',
+        authorizations=authorizations,
+        security='Bearer'
     )
 
     # Imports inside the function to avoid circular imports
@@ -48,5 +59,9 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(places_ns, path='/api/v1/places')
     api.add_namespace(reviews_ns, path='/api/v1/reviews')
     api.add_namespace(auth_ns, path='/api/v1/auth')
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return app.send_static_file('404.html'), 404
 
     return app

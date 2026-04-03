@@ -101,6 +101,8 @@ class Place(BaseModel):
         """
         Serialize the place instance to a dictionary
         """
+        ratings = [r.rating for r in self.reviews]
+        avg = round(sum(ratings) / len(ratings), 1) if ratings else None
         return {
             "id": self.id,
             "title": self.title,
@@ -109,6 +111,8 @@ class Place(BaseModel):
             "latitude": self.latitude,
             "longitude": self.longitude,
             "owner_id": self.owner_id,
+            "avg_rating": avg,
+            "review_count": len(ratings),
             "amenities": [{"id": a.id, "name": a.name}
                           for a in self.amenities],
             "created_at": self.created_at.isoformat(),
